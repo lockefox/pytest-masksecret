@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+from _pytest import capture
 
 
 def pytest_addoption(parser):
@@ -19,3 +20,7 @@ def pytest_addoption(parser):
 @pytest.fixture
 def bar(request):
     return request.config.option.dest_foo
+
+@pytest.fixture
+def capsecret(request):
+    """scrub the test report for registered secrets"""

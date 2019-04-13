@@ -3,6 +3,7 @@
 import pytest
 from _pytest import capture
 
+capture.capture_fixtures.update({'capsecret'})
 
 def pytest_addoption(parser):
     group = parser.getgroup('masksecret')

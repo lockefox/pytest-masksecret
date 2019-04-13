@@ -8,6 +8,8 @@ clean:
 	-@rm -rf *.egg-info
 	-@rm -rf .pytest_cache
 	-@rm .coverage
+	-@rm -rf pytest
+	-@rm -rf test/test_capture.py
 	-@rm -rf .tox
 
 # TODO: Windows: https://stackoverflow.com/a/12099167
@@ -44,9 +46,16 @@ $(VENV_FILE)/lib/python*/site-packages/tox/:
 $(VENV_FILE)/lib/python*/site-packages/tox-pyenv/:
 	@${WHICH_PIP} install tox
 
+pytest/testing/test_capture.py:
+	@git clone -n https://github.com/pytest-dev/pytest.git --depth 1
+	@cd pytest; git checkout HEAD testing/test_capture.py
+
+tests/test_capture.py: pytest/testing/test_capture.py
+	@cp -f pytest/testing/test_capture.py tests/test_capture.py
+
 .PHONY: venv-setup
 venv-setup: $(VENV_FILE) $(VENV_FILE)/lib/python*/site-packages/tox/ $(VENV_FILE)/lib/python*/site-packages/tox-pyenv/
 
 .PHONY: test
-test: venv-setup pyenv-local
+test: venv-setup pyenv-local tests/test_capture.py
 	@tox

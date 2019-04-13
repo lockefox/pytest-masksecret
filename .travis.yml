@@ -14,6 +14,7 @@ matrix:
 
 install:
   - pip install tox
+  - make tests/test_capture.py
 
 script:
   - tox -e $TOX_ENV

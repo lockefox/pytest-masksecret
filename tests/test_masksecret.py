@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+import pytest
 
-
+@pytest.mark.local
 def test_bar_fixture(testdir):
     """Make sure that pytest accepts our fixture."""
 
@@ -24,7 +25,7 @@ def test_bar_fixture(testdir):
     # make sure that that we get a '0' exit code for the testsuite
     assert result.ret == 0
 
-
+@pytest.mark.local
 def test_help_message(testdir):
     result = testdir.runpytest(
         '--help',
@@ -35,7 +36,7 @@ def test_help_message(testdir):
         '*--foo=DEST_FOO*Set the value for the fixture "bar".',
     ])
 
-
+@pytest.mark.local
 def test_hello_ini_setting(testdir):
     testdir.makeini("""
         [pytest]
@@ -62,3 +63,30 @@ def test_hello_ini_setting(testdir):
 
     # make sure that that we get a '0' exit code for the testsuite
     assert result.ret == 0
+
+@pytest.mark.local
+def test_capsecret_happypath(testdir):
+    testdir.makepyfile("""
+        import pytest
+
+        def fake_func(arg):
+            print(arg)
+            raise Exception
+
+        def test_capsecret(capsecret):
+            capsecret.register_secret('bob')
+            print(capsecret.dump_secret())
+            print('hello bob')
+            assert False
+
+        def test_nosecret(capsys):
+            print('hello bob')
+            assert False
+
+        def test_capsecret_func(capsecret):
+            fake_func('bob')
+
+    """)
+    result = testdir.runpytest('-v', '--tb=native')
+    print(f'\n~~~\nRESULT: `{result.outlines}`\n~~~\n')
+    assert False
